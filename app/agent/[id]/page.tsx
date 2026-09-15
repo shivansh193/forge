@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useAgents, useByokKey } from "@/lib/storage";
@@ -34,6 +34,7 @@ export default function AgentDetail() {
   const [demoResult, setDemoResult] = useState<DemoResult | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
+  const demoInFlight = useRef(false);
 
   useEffect(() => {
     if (head && draft === null) setDraft(head.config);
@@ -98,7 +99,8 @@ export default function AgentDetail() {
   }
 
   async function handleWantDemo() {
-    if (!pendingCommit) return;
+    if (!pendingCommit || demoInFlight.current) return;
+    demoInFlight.current = true;
     setFlowStep("demoLoading");
     setDemoError(null);
     try {
@@ -114,6 +116,8 @@ export default function AgentDetail() {
     } catch (err) {
       setDemoError(err instanceof Error ? err.message : "Demo generation failed.");
       setFlowStep("demoError");
+    } finally {
+      demoInFlight.current = false;
     }
   }
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChatMessage } from "@/lib/types";
+import Markdown from "./Markdown";
 
 export default function ChatPane({
   history,
@@ -47,7 +48,11 @@ export default function ChatPane({
                   : "bg-surface-soft border border-line-soft text-ink-muted")
               }
             >
-              <div className="whitespace-pre-wrap">{m.content}</div>
+              {m.role === "assistant" ? (
+                <Markdown>{m.content}</Markdown>
+              ) : (
+                <div className="whitespace-pre-wrap">{m.content}</div>
+              )}
             </div>
           </div>
         ))}

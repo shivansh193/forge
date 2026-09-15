@@ -1,5 +1,7 @@
 "use client";
 
+import Markdown from "./Markdown";
+
 export type FlowStep = "confirmCommit" | "confirmDemo" | "demoLoading" | "demoResult" | "demoError";
 
 export interface DemoResult {
@@ -105,8 +107,8 @@ export default function CommitFlow({
             {demoResult.testPrompt}
           </div>
           <div className="text-[12px] font-semibold text-ink-muted mb-1">Response</div>
-          <div className="text-[13px] leading-relaxed text-ink mb-4 whitespace-pre-wrap max-h-[240px] overflow-y-auto">
-            {demoResult.response}
+          <div className="text-[13px] leading-relaxed text-ink mb-4 max-h-[240px] overflow-y-auto">
+            <Markdown>{demoResult.response}</Markdown>
           </div>
           <div className="flex gap-2">
             <button onClick={onKeep} className={primaryBtn}>
