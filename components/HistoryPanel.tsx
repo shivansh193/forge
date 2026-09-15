@@ -27,9 +27,12 @@ export default function HistoryPanel({
   const ordered = [...commits].reverse();
 
   return (
-    <div className="border border-line rounded-md bg-surface shadow-[var(--shadow-card)]">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint px-5 pt-4 pb-3 border-b border-line-soft">
-        History &middot; {commits.length} commit{commits.length === 1 ? "" : "s"}
+    <div className="border border-line rounded-sm bg-surface">
+      <div className="flex items-baseline justify-between px-5 pt-4 pb-3 border-b border-line-soft">
+        <span className="tag-label">history</span>
+        <span className="tag-label">
+          {commits.length} commit{commits.length === 1 ? "" : "s"}
+        </span>
       </div>
 
       <div>
@@ -41,16 +44,19 @@ export default function HistoryPanel({
             <div key={c.id} className="px-5 py-3.5 border-b border-line-soft last:border-b-0">
               <div className="flex justify-between items-start gap-3">
                 <div className="min-w-0">
-                  <div className="text-[13px] font-semibold text-ink truncate">
-                    {c.message}
+                  <div className="flex items-baseline gap-2 min-w-0">
+                    <span className="font-mono text-[11px] text-ink-subtle shrink-0">
+                      {c.id.slice(-7)}
+                    </span>
+                    <span className="text-[13px] font-semibold text-ink truncate">{c.message}</span>
                     {isHead && (
-                      <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-sm bg-ok-bg text-ok">
-                        head
+                      <span className="font-mono text-[10px] text-ok border border-ok px-1 rounded-sm shrink-0">
+                        HEAD
                       </span>
                     )}
                   </div>
-                  <div className="font-mono text-[11px] text-ink-subtle mt-0.5">
-                    {formatTime(c.timestamp)} &middot; {c.id.slice(-8)}
+                  <div className="font-mono text-[11px] text-ink-subtle mt-1">
+                    {formatTime(c.timestamp)}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0">

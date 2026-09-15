@@ -20,10 +20,8 @@ export default function ConfigPanel({
   locked: boolean;
 }) {
   return (
-    <div className="border border-line rounded-md bg-surface shadow-[var(--shadow-card)] p-5">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint mb-3">
-        Config
-      </div>
+    <div className="border border-line rounded-sm bg-surface p-5">
+      <div className="tag-label mb-3">config</div>
 
       <label className="block text-[11px] font-semibold text-ink-muted mb-1.5">
         Prompt &amp; context
@@ -34,7 +32,7 @@ export default function ConfigPanel({
         rows={14}
         disabled={locked}
         placeholder="Paste your full system prompt here — instructions and any background/context together."
-        className="w-full p-3 text-[13px] font-serif border border-line rounded-sm resize-y leading-relaxed bg-surface-soft text-ink disabled:opacity-60 outline-none focus:border-ink-subtle"
+        className="w-full p-3 text-[13px] border border-line rounded-sm resize-y leading-relaxed bg-surface-soft text-ink disabled:opacity-60 outline-none focus:border-ink-subtle"
       />
 
       <div className="flex gap-4 mt-4 flex-wrap">
@@ -66,8 +64,8 @@ export default function ConfigPanel({
       </div>
 
       <div className="mt-5 pt-4 border-t border-line-soft">
-        <label className="block text-[11px] font-semibold uppercase tracking-wider text-ink-faint mb-1.5">
-          Optional: bring your own API key
+        <label className="block text-[11px] font-semibold text-ink-muted mb-1.5">
+          API key <span className="font-normal text-ink-subtle">(optional — use your own)</span>
         </label>
         <input
           type="password"

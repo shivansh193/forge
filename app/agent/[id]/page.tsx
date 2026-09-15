@@ -189,8 +189,8 @@ export default function AgentDetail() {
   return (
     <main className="max-w-[980px] mx-auto px-8 py-12">
       <div className="flex justify-between items-start gap-4">
-        <Link href="/" className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
-          ← All agents
+        <Link href="/" className="tag-label hover:text-ink-faint">
+          ← all agents
         </Link>
         <ThemeToggle />
       </div>
@@ -201,7 +201,7 @@ export default function AgentDetail() {
           value={nameDraft}
           onChange={(e) => setNameDraft(e.target.value)}
           onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
-          className="font-serif font-semibold text-[26px] text-ink bg-transparent outline-none border-b border-transparent focus:border-line"
+          className="font-bold text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line"
         />
       </div>
 

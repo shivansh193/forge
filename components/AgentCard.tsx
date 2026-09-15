@@ -12,7 +12,7 @@ export default function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/agent/${agent.id}`}
-      className="block border border-line rounded-md p-5 bg-surface shadow-[var(--shadow-card)] hover:border-ink-subtle transition-colors"
+      className="block border border-line rounded-sm p-5 bg-surface hover:border-ink-subtle transition-colors"
     >
       <div className="flex items-center gap-3">
         <Avatar seed={agent.avatarSeed} size={40} />

@@ -33,10 +33,10 @@ export default function CommitFlow({
   onRollback: () => void;
 }) {
   return (
-    <div className="mt-4 p-4 rounded-md border-2 border-accent bg-accent-soft">
+    <div className="mt-4 p-4 rounded-sm border-2 border-accent bg-accent-soft">
       {step === "confirmCommit" && (
         <>
-          <div className="text-[12px] font-semibold uppercase tracking-wide mb-2 text-accent">
+          <div className="text-[13px] font-semibold mb-2 text-accent">
             Commit this change?
           </div>
           <input
@@ -61,7 +61,7 @@ export default function CommitFlow({
 
       {step === "confirmDemo" && (
         <>
-          <div className="text-[12px] font-semibold uppercase tracking-wide mb-2 text-accent">
+          <div className="text-[13px] font-semibold mb-2 text-accent">
             Committed. Want a demo response with this version?
           </div>
           <div className="flex gap-2">
@@ -103,11 +103,11 @@ export default function CommitFlow({
 
       {step === "demoResult" && demoResult && (
         <>
-          <div className="text-[12px] font-semibold uppercase tracking-wide mb-3 text-accent">
+          <div className="text-[13px] font-semibold mb-3 text-accent">
             Demo response
           </div>
           <div className="text-[12px] font-semibold text-ink-muted mb-1">Test message</div>
-          <div className="text-[13px] font-serif italic text-ink mb-3 pl-3 border-l-2 border-accent">
+          <div className="text-[13px] italic text-ink mb-3 pl-3 border-l-2 border-accent">
             {demoResult.testPrompt}
           </div>
           <div className="text-[12px] font-semibold text-ink-muted mb-1">Response</div>

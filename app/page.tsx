@@ -42,23 +42,24 @@ export default function Home() {
 
   return (
     <main className="max-w-[880px] mx-auto px-8 py-16 w-full">
-      <div className="flex justify-between items-start gap-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint mb-2">
-          Forge
+      <div className="flex justify-between items-center">
+        <div className="tag-label flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+          forge
         </div>
         <ThemeToggle />
       </div>
-      <h1 className="font-serif font-semibold text-[38px] leading-[1.15] tracking-[-0.018em] text-ink">
+      <h1 className="font-bold text-[40px] leading-[1.1] tracking-[-0.02em] text-ink mt-4">
         Your agents
       </h1>
-      <p className="text-[13px] text-ink-faint mt-3 max-w-[520px] leading-relaxed">
-        Every agent has a config, a chat, and a commit history. Edit the prompt, see a demo
+      <p className="text-[14px] text-ink-faint mt-3 max-w-[480px] leading-relaxed">
+        Every agent keeps a config, a chat, and a commit history. Edit the prompt, preview a
         response, keep it or roll it back.
       </p>
 
       <div className="mt-10 flex justify-between items-center">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
-          {loaded ? `${agents.length} agent${agents.length === 1 ? "" : "s"}` : "Loading…"}
+        <div className="tag-label">
+          {loaded ? `${agents.length} agent${agents.length === 1 ? "" : "s"}` : "loading…"}
         </div>
         <button
           onClick={createAgent}

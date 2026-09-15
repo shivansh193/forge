@@ -28,9 +28,9 @@ export default function ChatPane({
   }
 
   return (
-    <div className="border border-line rounded-md bg-surface shadow-[var(--shadow-card)] flex flex-col h-[560px]">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint px-5 pt-4 pb-3 border-b border-line-soft">
-        Chat
+    <div className="border border-line rounded-sm bg-surface flex flex-col h-[560px]">
+      <div className="tag-label px-5 pt-4 pb-3 border-b border-line-soft">
+        chat
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
