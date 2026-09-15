@@ -12,20 +12,20 @@ export default function AgentCard({ agent }: { agent: Agent }) {
   return (
     <Link
       href={`/agent/${agent.id}`}
-      className="block border border-line rounded-[6px] p-4 bg-surface shadow-[var(--shadow-sm)] hover:border-ink-subtle hover:shadow-[var(--shadow-md)] transition-all"
+      className="flex gap-4 border border-line rounded-[14px] bg-surface px-5 py-[18px] hover:border-ink-subtle transition-colors"
     >
-      <div className="flex items-center gap-3">
-        <Avatar seed={agent.avatarSeed} size={40} />
-        <div className="min-w-0">
+      <Avatar seed={agent.avatarSeed} size={38} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline justify-between">
           <div className="font-semibold text-[15px] text-ink truncate">{agent.name}</div>
-          <div className="text-[11px] font-mono text-ink-subtle">
+          <div className="meta shrink-0">
             {commits.length} commit{commits.length === 1 ? "" : "s"}
           </div>
         </div>
-      </div>
-      <div className="text-[13px] text-ink-faint mt-3 leading-relaxed line-clamp-2">
-        {preview}
-        {preview.length === 120 ? "…" : ""}
+        <div className="text-[13px] text-ink-faint mt-1.5 leading-relaxed line-clamp-2">
+          {preview}
+          {preview.length === 120 ? "…" : ""}
+        </div>
       </div>
     </Link>
   );

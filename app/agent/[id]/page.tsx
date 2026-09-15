@@ -201,7 +201,7 @@ export default function AgentDetail() {
           value={nameDraft}
           onChange={(e) => setNameDraft(e.target.value)}
           onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
-          className="font-bold text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line"
+          className="font-serif italic font-medium text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line"
         />
       </div>
 

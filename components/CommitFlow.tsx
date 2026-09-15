@@ -8,11 +8,11 @@ export interface DemoResult {
 }
 
 const primaryBtn =
-  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[6px] bg-accent text-accent-ink border border-black/10 shadow-[var(--shadow-sm)] hover:bg-accent-hover transition-colors";
+  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover transition-colors";
 const secondaryBtn =
-  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[6px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors";
+  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors";
 const dangerBtn =
-  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[6px] bg-surface text-bad border border-line hover:bg-bad-bg transition-colors";
+  "cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-surface text-bad border border-line hover:bg-bad-bg transition-colors";
 
 export default function CommitFlow({
   step,
@@ -40,7 +40,7 @@ export default function CommitFlow({
   onRollback: () => void;
 }) {
   return (
-    <div className="mt-4 p-4 rounded-[6px] border border-accent bg-accent-soft shadow-[var(--shadow-sm)]">
+    <div className="mt-4 p-4 rounded-[14px] border border-accent bg-accent-soft">
       {step === "confirmCommit" && (
         <>
           <div className="text-[13px] font-semibold mb-2.5 text-ink">Commit this change?</div>
@@ -48,7 +48,7 @@ export default function CommitFlow({
             value={commitMessage}
             onChange={(e) => onCommitMessageChange(e.target.value)}
             placeholder="Commit message"
-            className="w-full text-[13px] px-3 h-9 border border-line rounded-[6px] mb-3 bg-surface text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/25"
+            className="w-full text-[13px] px-3 h-9 border border-line rounded-[6px] mb-3 bg-surface text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
           <div className="flex gap-2">
             <button onClick={onConfirmCommit} className={primaryBtn}>
@@ -101,7 +101,7 @@ export default function CommitFlow({
         <>
           <div className="text-[13px] font-semibold mb-3 text-ink">Demo response</div>
           <div className="text-[12px] font-semibold text-ink-muted mb-1">Test message</div>
-          <div className="text-[13px] italic text-ink mb-3 pl-3 border-l-2 border-accent">
+          <div className="font-serif text-[15px] italic text-ink mb-3 pl-3 border-l-2 border-accent">
             {demoResult.testPrompt}
           </div>
           <div className="text-[12px] font-semibold text-ink-muted mb-1">Response</div>

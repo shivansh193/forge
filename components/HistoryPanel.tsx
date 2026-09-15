@@ -27,7 +27,7 @@ export default function HistoryPanel({
   const ordered = [...commits].reverse();
 
   return (
-    <div className="border border-line rounded-[6px] bg-surface shadow-[var(--shadow-sm)]">
+    <div className="border border-line rounded-[14px] bg-surface">
       <div className="flex items-baseline justify-between px-4 pt-3.5 pb-3 border-b border-line-soft">
         <span className="panel-label">History</span>
         <span className="meta">

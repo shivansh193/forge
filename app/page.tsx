@@ -41,37 +41,40 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-[880px] mx-auto px-8 py-16 w-full">
+    <main className="max-w-[640px] mx-auto px-9 py-16 w-full">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2 text-[14px] font-semibold text-ink">
-          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" className="text-accent">
-            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 12H7V7h2v5zm0-6H7V4h2v2z" />
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-ink">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z" />
           </svg>
           Forge
         </div>
         <ThemeToggle />
       </div>
-      <h1 className="font-bold text-[32px] leading-[1.2] tracking-[-0.01em] text-ink mt-6">
+
+      <div className="h-px bg-line my-6" />
+
+      <h1 className="font-serif italic font-medium text-[40px] leading-[1.08] tracking-[-0.01em] text-ink">
         Your agents
       </h1>
-      <p className="text-[14px] text-ink-faint mt-2 max-w-[480px] leading-relaxed">
-        Every agent keeps a config, a chat, and a commit history. Edit the prompt, preview a
+      <p className="text-[14px] text-ink-faint mt-3.5 max-w-[400px] leading-relaxed">
+        Every agent keeps a config, a chat, and a commit history — edit the prompt, preview a
         response, keep it or roll it back.
       </p>
 
-      <div className="mt-8 flex justify-between items-center">
-        <div className="field-label">
-          {loaded ? `${agents.length} agent${agents.length === 1 ? "" : "s"}` : "Loading…"}
+      <div className="mt-8 flex items-baseline justify-between">
+        <div className="meta">
+          {loaded ? String(agents.length).padStart(2, "0") : "00"} / agents
         </div>
         <button
           onClick={createAgent}
-          className="cursor-pointer text-[13px] font-medium h-8 px-3.5 rounded-[6px] bg-accent text-accent-ink border border-black/10 shadow-[var(--shadow-sm)] hover:bg-accent-hover transition-colors"
+          className="cursor-pointer text-[13px] font-medium h-[34px] px-[18px] rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover transition-colors"
         >
-          New agent
+          + New agent
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+      <div className="flex flex-col gap-3 mt-4">
         {agents.map((a) => (
           <AgentCard key={a.id} agent={a} />
         ))}

@@ -8,12 +8,12 @@ function hashSeed(seed: string): number {
 }
 
 const PALETTES: [string, string][] = [
-  ["#f97362", "#7a2e22"],
-  ["#5b8def", "#1d3f7a"],
-  ["#4fb08a", "#1c4a37"],
-  ["#c084fc", "#4c1d7a"],
-  ["#f4b942", "#7a5205"],
-  ["#3fb6c9", "#0d4a55"],
+  ["#7a5ea8", "#4b3a72"],
+  ["#3f8f86", "#245a53"],
+  ["#5470a6", "#2f3a5c"],
+  ["#c8933f", "#8a5f1e"],
+  ["#b8654f", "#7a3d2c"],
+  ["#7a9470", "#4a5f42"],
 ];
 
 export default function Avatar({ seed, size = 40 }: { seed: string; size?: number }) {
@@ -28,11 +28,12 @@ export default function Avatar({ seed, size = 40 }: { seed: string; size?: numbe
 
   return (
     <div
-      className="flex items-center justify-center rounded-full font-semibold text-white shrink-0"
+      className="flex items-center justify-center font-semibold text-white shrink-0"
       style={{
         width: size,
         height: size,
-        fontSize: size * 0.38,
+        borderRadius: size * 0.29,
+        fontSize: size * 0.36,
         background: `linear-gradient(135deg, ${from}, ${to})`,
       }}
     >

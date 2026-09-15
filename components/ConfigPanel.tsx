@@ -3,7 +3,7 @@
 import { AgentConfig } from "@/lib/types";
 
 const inputClass =
-  "w-full text-[13px] px-3 py-[6px] border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/25 disabled:opacity-60";
+  "w-full text-[13px] px-3 py-[6px] border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60";
 
 export default function ConfigPanel({
   draft,
@@ -23,7 +23,7 @@ export default function ConfigPanel({
   locked: boolean;
 }) {
   return (
-    <div className="border border-line rounded-[6px] bg-surface shadow-[var(--shadow-sm)] p-4">
+    <div className="border border-line rounded-[14px] bg-surface p-5">
       <div className="panel-label mb-3 pb-3 border-b border-line-soft">Config</div>
 
       <label className="block field-label mb-1.5">Prompt &amp; context</label>
@@ -83,7 +83,7 @@ export default function ConfigPanel({
       <button
         onClick={onSave}
         disabled={!isDirty || locked}
-        className="mt-5 w-full cursor-pointer text-[13px] font-medium h-9 rounded-[6px] bg-accent text-accent-ink border border-black/10 shadow-[var(--shadow-sm)] hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
+        className="mt-5 w-full cursor-pointer text-[13px] font-medium h-9 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
       >
         {locked ? "Resolve the pending commit below" : isDirty ? "Save changes…" : "No changes to commit"}
       </button>

@@ -28,7 +28,7 @@ export default function ChatPane({
   }
 
   return (
-    <div className="border border-line rounded-[6px] bg-surface shadow-[var(--shadow-sm)] flex flex-col h-[560px]">
+    <div className="border border-line rounded-[14px] bg-surface flex flex-col h-[560px]">
       <div className="panel-label px-4 pt-3.5 pb-3 border-b border-line-soft">Chat</div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
@@ -66,12 +66,12 @@ export default function ChatPane({
           }}
           disabled={disabled}
           placeholder={disabled ? "Add a prompt first…" : "Message this agent…"}
-          className="flex-1 text-[13px] px-3 h-9 border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/25 disabled:opacity-60"
+          className="flex-1 text-[13px] px-3 h-9 border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
         />
         <button
           onClick={handleSend}
           disabled={disabled || sending || !input.trim()}
-          className="cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[6px] bg-accent text-accent-ink border border-black/10 shadow-[var(--shadow-sm)] hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
+          className="cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
         >
           Send
         </button>
