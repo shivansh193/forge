@@ -1,4 +1,5 @@
 import { ProviderClient } from "./types";
+import { robustFetch, ProviderError } from "./request";
 
 const DEFAULT_MODEL = "gpt-4o-mini";
 
@@ -9,7 +10,7 @@ async function complete(
   model: string,
   apiKey: string
 ): Promise<string> {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await robustFetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
@@ -24,12 +25,12 @@ async function complete(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`OpenAI ${res.status}: ${body.slice(0, 300)}`);
+    throw new ProviderError(`OpenAI ${res.status}: ${body.slice(0, 300)}`, "http_error", res.status);
   }
 
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content;
-  if (!text) throw new Error("OpenAI returned no text.");
+  if (!text) throw new ProviderError("OpenAI returned no text.", "http_error");
   return text as string;
 }
 

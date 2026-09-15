@@ -1,4 +1,5 @@
 import { ProviderClient } from "./types";
+import { robustFetch, ProviderError } from "./request";
 
 const DEFAULT_MODEL = "gemini-flash-lite-latest";
 
@@ -9,7 +10,7 @@ async function complete(
   model: string,
   apiKey: string
 ): Promise<string> {
-  const res = await fetch(
+  const res = await robustFetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model?.trim() || DEFAULT_MODEL}:generateContent`,
     {
       method: "POST",
@@ -24,12 +25,12 @@ async function complete(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Gemini ${res.status}: ${body.slice(0, 300)}`);
+    throw new ProviderError(`Gemini ${res.status}: ${body.slice(0, 300)}`, "http_error", res.status);
   }
 
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Gemini returned no text.");
+  if (!text) throw new ProviderError("Gemini returned no text.", "http_error");
   return text as string;
 }
 

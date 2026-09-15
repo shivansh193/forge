@@ -1,4 +1,5 @@
 import { ProviderClient } from "./types";
+import { robustFetch, ProviderError } from "./request";
 
 const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
 
@@ -9,7 +10,7 @@ async function complete(
   model: string,
   apiKey: string
 ): Promise<string> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await robustFetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,12 +28,12 @@ async function complete(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Anthropic ${res.status}: ${body.slice(0, 300)}`);
+    throw new ProviderError(`Anthropic ${res.status}: ${body.slice(0, 300)}`, "http_error", res.status);
   }
 
   const data = await res.json();
   const text = data?.content?.[0]?.text;
-  if (!text) throw new Error("Anthropic returned no text.");
+  if (!text) throw new ProviderError("Anthropic returned no text.", "http_error");
   return text as string;
 }
 

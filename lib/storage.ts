@@ -8,7 +8,7 @@ const STORAGE_KEY = "forge.agents.v1";
 const API_KEY_STORAGE = "forge.byokKey.v1";
 const SYNC_EVENT = "forge:agents-changed";
 
-function normalizeAgent(agent: Agent): Agent {
+export function normalizeAgent(agent: Agent): Agent {
   return {
     ...agent,
     commits: agent.commits.map((c) => ({
