@@ -16,9 +16,13 @@ export function diffPrompt(oldText: string, newText: string): DiffToken[] {
 }
 
 // Fraction of the combined text (by character count) that changed between
-// two texts — 0 means identical, 1 means completely different. Used to flag
-// meaningful drift in model outputs without needing another model call to
-// judge "did this change."
+// two texts — 0 means identical, 1 means completely different. Cheap and
+// free, but it measures text edit distance, not meaning: a paraphrase can
+// score high while meaning the same thing, and a one-word negation flip can
+// score low while reversing intent. Used as a free pre-filter (skip the
+// judge only when outputs are byte-identical) and as a fallback signal when
+// the judge call fails — see lib/judge.ts for the actual same/different
+// classification.
 export function diffMagnitude(oldText: string, newText: string): number {
   const tokens = diffPrompt(oldText, newText);
   let changed = 0;

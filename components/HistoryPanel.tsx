@@ -162,6 +162,7 @@ function RegressionBadge({ results }: { results: Commit["regressionResults"] }) 
                 )}
               </div>
               <div className="text-[12px] text-ink-subtle italic mb-2">{r.input}</div>
+              {r.reason && <div className="text-[12px] text-ink-subtle mb-2">{r.reason}</div>}
               {r.prevOutput !== null && r.newOutput !== null && (
                 <DiffView tokens={diffPrompt(r.prevOutput, r.newOutput)} />
               )}

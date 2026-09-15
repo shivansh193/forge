@@ -27,6 +27,11 @@ export interface RegressionResult {
   prevOutput: string | null;
   newOutput: string | null;
   changed: boolean;
+  // The judge's one-line explanation for "changed" when a judge call ran
+  // (lib/judge.ts), or a note that it fell back to the text-diff heuristic
+  // because the judge call failed. Null when no judge call was made at all
+  // (outputs were byte-identical, or the whole test errored).
+  reason: string | null;
   error: string | null;
 }
 
