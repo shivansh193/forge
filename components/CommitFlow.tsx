@@ -2,7 +2,13 @@
 
 import Markdown from "./Markdown";
 
-export type FlowStep = "confirmCommit" | "confirmDemo" | "demoLoading" | "demoResult" | "demoError";
+export type FlowStep =
+  | "confirmCommit"
+  | "regressionLoading"
+  | "confirmDemo"
+  | "demoLoading"
+  | "demoResult"
+  | "demoError";
 
 export interface DemoResult {
   testPrompt: string;
@@ -63,6 +69,13 @@ export default function CommitFlow({
             </button>
           </div>
         </>
+      )}
+
+      {step === "regressionLoading" && (
+        <div className="flex items-center gap-2.5 text-[14px] text-ink">
+          <span className="w-2 h-2 rounded-full shrink-0 bg-accent animate-pulse" />
+          Running pinned tests against old and new versions…
+        </div>
       )}
 
       {step === "confirmDemo" && (

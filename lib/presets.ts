@@ -40,6 +40,7 @@ function seedAgent(id: string, name: string, avatarSeed: string, prompt: string,
       },
     ],
     chatHistory: [],
+    pinnedTests: [],
   };
 }
 

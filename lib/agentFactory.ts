@@ -4,11 +4,20 @@ export function newAgentId(): string {
   return `agent-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
+export function newTestId(): string {
+  return `test-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
 export function blankConfig(): AgentConfig {
   return { provider: "gemini", prompt: "", temperature: 0.7, model: "gemini-flash-lite-latest" };
 }
 
-export function createAgentRecord(name: string, config: AgentConfig, commitMessage: string): Agent {
+export function createAgentRecord(
+  name: string,
+  config: AgentConfig,
+  commitMessage: string,
+  forkedFrom?: string
+): Agent {
   const id = newAgentId();
   const now = new Date().toISOString();
   return {
@@ -28,5 +37,7 @@ export function createAgentRecord(name: string, config: AgentConfig, commitMessa
       },
     ],
     chatHistory: [],
+    pinnedTests: [],
+    forkedFrom,
   };
 }

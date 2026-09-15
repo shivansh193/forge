@@ -21,6 +21,7 @@ function makeAgentWithConfig(config: Record<string, unknown>): Agent {
       },
     ],
     chatHistory: [],
+    pinnedTests: [],
   };
 }
 

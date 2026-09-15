@@ -6,13 +6,17 @@ import Link from "next/link";
 import { useAgents, useByokKey } from "@/lib/storage";
 import { createAgentRecord } from "@/lib/agentFactory";
 import { encodeShare } from "@/lib/share";
-import { AgentConfig, Commit } from "@/lib/types";
+import { AgentConfig, Commit, PinnedTest } from "@/lib/types";
 import { diffPrompt, summarizeDiff } from "@/lib/diff";
+import { runRegressionSuite } from "@/lib/regression";
 import Avatar from "@/components/Avatar";
 import ConfigPanel from "@/components/ConfigPanel";
 import ChatPane from "@/components/ChatPane";
 import HistoryPanel from "@/components/HistoryPanel";
 import CommitFlow, { DemoResult, FlowStep } from "@/components/CommitFlow";
+import PinnedTestsPanel from "@/components/PinnedTestsPanel";
+import BisectPanel from "@/components/BisectPanel";
+import ForkCompare from "@/components/ForkCompare";
 
 function nanoid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -28,6 +32,7 @@ export default function AgentDetail() {
   const agent = agents.find((a) => a.id === id);
   const finalized = agent?.commits.filter((c) => c.status !== "discarded" && c.status !== "pending") ?? [];
   const head = finalized[finalized.length - 1];
+  const otherAgents = agents.filter((a) => a.id !== id);
 
   const [draft, setDraft] = useState<AgentConfig | null>(null);
   const [flowStep, setFlowStep] = useState<FlowStep | null>(null);
@@ -38,9 +43,14 @@ export default function AgentDetail() {
   const [nameDraft, setNameDraft] = useState("");
   const [demoPhase, setDemoPhase] = useState<"prompt" | "response" | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
+  const [bisectOpen, setBisectOpen] = useState(false);
   const demoInFlight = useRef(false);
 
+  // head/agent come from useAgents(), which only populates after mount (it
+  // reads localStorage) — this can't be computed during render, and needs to
+  // re-sync whenever the route's :id changes to a different agent.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (head && draft === null) setDraft(head.config);
     if (agent) setNameDraft(agent.name);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,7 +81,14 @@ export default function AgentDetail() {
     setFlowStep("confirmCommit");
   }
 
-  function handleConfirmCommit() {
+  async function handleConfirmCommit() {
+    const pinnedTests = agent!.pinnedTests;
+    let regressionResults: Commit["regressionResults"];
+    if (pinnedTests.length > 0) {
+      setFlowStep("regressionLoading");
+      regressionResults = await runRegressionSuite(pinnedTests, head!.config, draft!, byokKey);
+    }
+
     const newCommit: Commit = {
       id: nanoid(),
       timestamp: new Date().toISOString(),
@@ -80,6 +97,7 @@ export default function AgentDetail() {
       promptDiffFromPrev: JSON.stringify(diffPrompt(head!.config.prompt, draft!.prompt)),
       status: "pending",
       demo: null,
+      regressionResults,
     };
     updateAgent(agent!.id, (a) => ({ ...a, commits: [...a.commits, newCommit] }));
     setPendingCommit(newCommit);
@@ -144,9 +162,18 @@ export default function AgentDetail() {
 
   function handleFork() {
     if (!head) return;
-    const forked = createAgentRecord(`${agent!.name} (fork)`, head.config, `Forked from ${agent!.name}`);
+    const forked = createAgentRecord(
+      `${agent!.name} (fork)`,
+      head.config,
+      `Forked from ${agent!.name}`,
+      agent!.id
+    );
     addAgent(forked);
     router.push(`/agent/${forked.id}`);
+  }
+
+  function handlePinnedTestsChange(next: PinnedTest[]) {
+    updateAgent(agent!.id, (a) => ({ ...a, pinnedTests: next }));
   }
 
   async function handleShare() {
@@ -257,16 +284,27 @@ export default function AgentDetail() {
             >
               Fork
             </button>
+            {finalized.length >= 2 && (
+              <button
+                onClick={() => setBisectOpen(!bisectOpen)}
+                className="cursor-pointer text-[14px] font-medium h-10 px-5 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
+              >
+                {bisectOpen ? "Hide bisect" : "Bisect"}
+              </button>
+            )}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
           <div className="space-y-7">
             <ChatPane history={agent.chatHistory} onSend={handleChatSend} disabled={!head.config.prompt.trim()} />
-            <HistoryPanel commits={finalized} onRestore={handleRestore} />
+            <HistoryPanel commits={finalized} onRestore={handleRestore} byokKey={byokKey} />
+            {bisectOpen && <BisectPanel commits={finalized} apiKey={byokKey} />}
+            <PinnedTestsPanel tests={agent.pinnedTests} onChange={handlePinnedTestsChange} />
           </div>
 
           <div>
+            {otherAgents.length > 0 && <ForkCompare agent={agent} otherAgents={otherAgents} apiKey={byokKey} />}
             <ConfigPanel
               draft={draft}
               onChange={setDraft}

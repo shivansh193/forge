@@ -31,7 +31,7 @@ function ImportContent() {
         <div className="max-w-[520px]">
           <h1 className="font-serif italic font-medium text-[32px] text-ink">Nothing to import</h1>
           <p className="text-[14px] text-ink-faint mt-3 leading-relaxed">
-            This link doesn't carry a valid agent — it may be malformed or incomplete.
+            This link doesn&apos;t carry a valid agent — it may be malformed or incomplete.
           </p>
           <Link href="/" className="inline-block mt-5 text-[14px] font-medium text-accent">
             ← Back to your agents
@@ -63,8 +63,8 @@ function ImportContent() {
         </div>
 
         <p className="text-[13px] text-ink-subtle mt-4 leading-relaxed">
-          Importing adds this as a new agent in your own workspace, starting fresh — it won't touch the
-          sender's copy, and you can edit or fork it right away.
+          Importing adds this as a new agent in your own workspace, starting fresh — it won&apos;t touch the
+          sender&apos;s copy, and you can edit or fork it right away.
         </p>
 
         <button

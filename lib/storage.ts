@@ -15,6 +15,7 @@ export function normalizeAgent(agent: Agent): Agent {
       ...c,
       config: { ...c.config, provider: c.config.provider ?? "gemini" },
     })),
+    pinnedTests: agent.pinnedTests ?? [],
   };
 }
 
@@ -50,9 +51,13 @@ export function useAgents() {
   // see localStorage already updated, not wait for React to flush.
   const agentsRef = useRef<Agent[]>([]);
 
+  // Reads localStorage, which doesn't exist during SSR — can't be a lazy
+  // useState initializer without diverging from the server-rendered markup
+  // and breaking hydration, so this has to run as a client-only effect.
   useEffect(() => {
     const initial = readAgents();
     agentsRef.current = initial;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAgents(initial);
     setLoaded(true);
 
@@ -101,8 +106,11 @@ export function useAgents() {
 export function useByokKey() {
   const [key, setKey] = useState("");
 
+  // Reads localStorage, which doesn't exist during SSR — client-only effect
+  // for the same reason as useAgents above.
   useEffect(() => {
     const stored = window.localStorage.getItem(API_KEY_STORAGE);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setKey(stored);
   }, []);
 

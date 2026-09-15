@@ -14,6 +14,22 @@ export interface DemoResponse {
   response: string;
 }
 
+export interface PinnedTest {
+  id: string;
+  label: string;
+  input: string;
+}
+
+export interface RegressionResult {
+  testId: string;
+  label: string;
+  input: string;
+  prevOutput: string | null;
+  newOutput: string | null;
+  changed: boolean;
+  error: string | null;
+}
+
 export interface Commit {
   id: string;
   timestamp: string;
@@ -22,6 +38,7 @@ export interface Commit {
   promptDiffFromPrev: string | null;
   status: CommitStatus;
   demo: DemoResponse | null;
+  regressionResults?: RegressionResult[];
 }
 
 export interface ChatMessage {
@@ -39,4 +56,6 @@ export interface Agent {
   createdAt: string;
   commits: Commit[];
   chatHistory: ChatMessage[];
+  pinnedTests: PinnedTest[];
+  forkedFrom?: string;
 }

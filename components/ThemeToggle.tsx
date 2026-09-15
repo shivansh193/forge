@@ -12,9 +12,13 @@ function applyTheme(theme: "light" | "dark") {
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
+  // Reads document.documentElement/matchMedia, neither of which exist during
+  // SSR — this can't be a lazy useState initializer without breaking
+  // hydration, so it has to run as a client-only effect.
   useEffect(() => {
     const current = document.documentElement.getAttribute("data-theme");
     if (current === "light" || current === "dark") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme(current);
     } else {
       setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");

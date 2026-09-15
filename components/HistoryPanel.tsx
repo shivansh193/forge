@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Commit } from "@/lib/types";
 import { diffPrompt } from "@/lib/diff";
 import DiffView from "./DiffView";
+import BehavioralDiff from "./BehavioralDiff";
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -19,11 +20,14 @@ function formatTime(iso: string): string {
 export default function HistoryPanel({
   commits,
   onRestore,
+  byokKey,
 }: {
   commits: Commit[];
   onRestore: (commit: Commit) => void;
+  byokKey: string;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [behaviorOpen, setBehaviorOpen] = useState<string | null>(null);
   const ordered = [...commits].reverse();
 
   return (
@@ -66,6 +70,14 @@ export default function HistoryPanel({
                       {isOpen ? "Hide diff" : "View diff"}
                     </button>
                   )}
+                  {prev && (
+                    <button
+                      onClick={() => setBehaviorOpen(behaviorOpen === c.id ? null : c.id)}
+                      className="cursor-pointer text-[13px] font-medium px-2.5 h-8 rounded-[6px] text-accent hover:bg-surface-soft transition-colors"
+                    >
+                      {behaviorOpen === c.id ? "Hide behavior" : "Compare behavior"}
+                    </button>
+                  )}
                   {!isHead && (
                     <button
                       onClick={() => onRestore(c)}
@@ -83,15 +95,80 @@ export default function HistoryPanel({
                 </div>
               )}
 
+              {behaviorOpen === c.id && prev && (
+                <div className="mt-3.5 p-4 rounded-[8px] bg-surface-soft border border-line-soft">
+                  <BehavioralDiff
+                    leftLabel={prev.id.slice(-7)}
+                    leftConfig={prev.config}
+                    rightLabel={c.id.slice(-7)}
+                    rightConfig={c.config}
+                    apiKey={byokKey}
+                    initialMessage={c.demo?.testPrompt ?? prev.demo?.testPrompt ?? ""}
+                  />
+                </div>
+              )}
+
               {c.demo && (
                 <div className="mt-2.5 text-[13px] text-ink-subtle italic">
                   Demo-tested before commit
                 </div>
               )}
+
+              {c.regressionResults && c.regressionResults.length > 0 && (
+                <RegressionBadge results={c.regressionResults} />
+              )}
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function RegressionBadge({ results }: { results: Commit["regressionResults"] }) {
+  const [open, setOpen] = useState(false);
+  const list = results ?? [];
+  const drifted = list.filter((r) => r.changed);
+  const failed = list.filter((r) => r.error);
+
+  return (
+    <div className="mt-2.5">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`cursor-pointer text-[13px] font-medium px-2.5 h-7 rounded-[4px] transition-colors ${
+          drifted.length > 0
+            ? "text-bad bg-bad-bg hover:opacity-80"
+            : "text-ok bg-ok-bg hover:opacity-80"
+        }`}
+      >
+        {drifted.length > 0
+          ? `${drifted.length} of ${list.length} pinned test${list.length === 1 ? "" : "s"} drifted`
+          : `${list.length} pinned test${list.length === 1 ? "" : "s"} passed`}
+        {failed.length > 0 ? ` · ${failed.length} couldn't run` : ""}
+      </button>
+
+      {open && (
+        <div className="mt-2.5 space-y-3">
+          {list.map((r) => (
+            <div key={r.testId} className="p-3.5 rounded-[8px] bg-surface-soft border border-line-soft">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[13px] font-semibold text-ink">{r.label}</span>
+                {r.error ? (
+                  <span className="meta text-bad">{r.error}</span>
+                ) : (
+                  <span className={`meta ${r.changed ? "text-bad" : "text-ok"}`}>
+                    {r.changed ? "drifted" : "stable"}
+                  </span>
+                )}
+              </div>
+              <div className="text-[12px] text-ink-subtle italic mb-2">{r.input}</div>
+              {r.prevOutput !== null && r.newOutput !== null && (
+                <DiffView tokens={diffPrompt(r.prevOutput, r.newOutput)} />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

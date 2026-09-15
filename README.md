@@ -10,6 +10,10 @@ Forge treats a prompt like code: every agent keeps a real commit history. Edit t
 
 - **Commit-based versioning** — real word-level diffs and history for every agent's prompt, not autosave.
 - **Demo before you commit** — an AI writes a realistic test message from the prompt itself and runs the proposed version against it, so you see a real response before deciding to keep it.
+- **Behavioral diff** — a text diff only shows the prompt changed; this runs one message through two versions and diffs the actual outputs, so you see how the agent's behavior changed, not just its instructions.
+- **Pinned regression tests** — save test inputs on an agent; every new commit auto-reruns them against the old and new prompt and flags any output that drifted, before you finalize the commit.
+- **Bisect** — run one message across an agent's entire commit history to pinpoint which commit introduced a behavior change.
+- **Fork compare** — the same behavioral diff, applied across two forks instead of two commits, to see how they've diverged.
 - **One-click rollback** — discard a bad version instantly; nothing overwrites silently.
 - **Fork** — clone any agent's current version as the starting point for a new one.
 - **Multi-model** — Gemini, OpenAI, or Anthropic per agent, swappable from a dropdown.
@@ -53,12 +57,11 @@ This is the **shared fallback key for Gemini only** — get a free one at [aistu
 
 - No cross-device sync — an agent lives in the browser that created it, until shared.
 - OpenAI and Anthropic completions are untested against a live key in this build; the request/response plumbing and error paths are verified, the actual model output is not.
-- No automated test suite yet.
+- Bisect and fork compare re-run one message per commit/fork sequentially in the browser — fine at the scale of a single agent's history, not built for hundreds of commits.
 
 ## Roadmap
 
 - Team workspaces — a real backend so commit history is shared, not per-browser.
 - Streaming responses in chat and demo previews.
-- Side-by-side compare of two versions against the same test set.
 - A public template/agent marketplace, built on the existing share/import mechanism.
 - Direct API access to a committed prompt version — the path from "tested" to "in production."
