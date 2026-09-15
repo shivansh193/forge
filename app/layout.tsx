@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Newsreader, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import Sidebar from "@/components/Sidebar";
+import MobileTopBar from "@/components/MobileTopBar";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -43,9 +45,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${newsreader.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-page text-ink">
+      <body className="min-h-full bg-page text-ink">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
-        {children}
+        <div className="flex min-h-screen">
+          <Sidebar />
+          <div className="flex-1 min-w-0 flex flex-col">
+            <MobileTopBar />
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

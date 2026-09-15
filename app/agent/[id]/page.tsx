@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAgents, useByokKey } from "@/lib/storage";
 import { createAgentRecord } from "@/lib/agentFactory";
+import { encodeShare } from "@/lib/share";
 import { AgentConfig, Commit } from "@/lib/types";
 import { diffPrompt, summarizeDiff } from "@/lib/diff";
 import Avatar from "@/components/Avatar";
@@ -12,7 +13,6 @@ import ConfigPanel from "@/components/ConfigPanel";
 import ChatPane from "@/components/ChatPane";
 import HistoryPanel from "@/components/HistoryPanel";
 import CommitFlow, { DemoResult, FlowStep } from "@/components/CommitFlow";
-import ThemeToggle from "@/components/ThemeToggle";
 
 function nanoid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -37,6 +37,7 @@ export default function AgentDetail() {
   const [demoError, setDemoError] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   const [demoPhase, setDemoPhase] = useState<"prompt" | "response" | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const demoInFlight = useRef(false);
 
   useEffect(() => {
@@ -46,11 +47,11 @@ export default function AgentDetail() {
   }, [head?.id, agent?.name]);
 
   if (!loaded) {
-    return <main className="max-w-[880px] mx-auto px-8 py-16 text-[13px] text-ink-faint">Loading…</main>;
+    return <main className="flex-1 px-10 py-16 text-[13px] text-ink-faint">Loading…</main>;
   }
   if (!agent || !head || !draft) {
     return (
-      <main className="max-w-[880px] mx-auto px-8 py-16">
+      <main className="flex-1 px-10 py-16">
         <div className="text-[13px] text-ink-faint">Agent not found.</div>
         <Link href="/" className="text-[13px] font-semibold text-accent">
           ← Back to agents
@@ -148,6 +149,19 @@ export default function AgentDetail() {
     router.push(`/agent/${forked.id}`);
   }
 
+  async function handleShare() {
+    if (!head) return;
+    const encoded = encodeShare({ name: agent!.name, config: head.config });
+    const url = `${window.location.origin}/import?a=${encoded}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      window.prompt("Copy this link:", url);
+    }
+  }
+
   function handleKeep() {
     finalizePending(demoResult);
   }
@@ -218,65 +232,68 @@ export default function AgentDetail() {
   }
 
   return (
-    <main className="max-w-[1240px] mx-auto px-10 py-14">
-      <div className="flex justify-between items-start gap-4">
-        <Link href="/" className="text-[14px] font-medium text-ink-faint hover:text-ink transition-colors">
-          ← All agents
-        </Link>
-        <ThemeToggle />
-      </div>
-
-      <div className="flex items-center justify-between gap-3 mt-5 mb-10">
-        <div className="flex items-center gap-4 min-w-0">
-          <Avatar seed={agent.avatarSeed} size={60} />
-          <input
-            value={nameDraft}
-            onChange={(e) => setNameDraft(e.target.value)}
-            onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
-            className="font-serif italic font-medium text-[38px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line min-w-0"
-          />
-        </div>
-        <button
-          onClick={handleFork}
-          className="shrink-0 cursor-pointer text-[14px] font-medium h-10 px-5 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
-        >
-          Fork
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-7">
-        <div className="space-y-7">
-          <ChatPane history={agent.chatHistory} onSend={handleChatSend} disabled={!head.config.prompt.trim()} />
-          <HistoryPanel commits={finalized} onRestore={handleRestore} />
-        </div>
-
-        <div>
-          <ConfigPanel
-            draft={draft}
-            onChange={setDraft}
-            isDirty={isDirty}
-            onSave={handleSaveClick}
-            byokKey={byokKey}
-            onByokChange={setByokKey}
-            locked={flowStep !== null}
-          />
-
-          {flowStep && (
-            <CommitFlow
-              step={flowStep}
-              commitMessage={commitMessageDraft}
-              onCommitMessageChange={setCommitMessageDraft}
-              onConfirmCommit={handleConfirmCommit}
-              onCancel={handleCancelCommit}
-              onWantDemo={handleWantDemo}
-              onSkipDemo={handleSkipDemo}
-              demoPhase={demoPhase}
-              demoResult={demoResult}
-              demoError={demoError}
-              onKeep={handleKeep}
-              onRollback={handleRollback}
+    <main className="flex-1 px-10 py-14">
+      <div className="max-w-[1700px] mx-auto">
+        <div className="flex items-center justify-between gap-3 mb-10">
+          <div className="flex items-center gap-4 min-w-0">
+            <Avatar seed={agent.avatarSeed} size={60} />
+            <input
+              value={nameDraft}
+              onChange={(e) => setNameDraft(e.target.value)}
+              onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
+              className="font-serif italic font-medium text-[38px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line min-w-0"
             />
-          )}
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={handleShare}
+              className="cursor-pointer text-[14px] font-medium h-10 px-5 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
+            >
+              {shareCopied ? "Link copied" : "Share"}
+            </button>
+            <button
+              onClick={handleFork}
+              className="cursor-pointer text-[14px] font-medium h-10 px-5 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
+            >
+              Fork
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
+          <div className="space-y-7">
+            <ChatPane history={agent.chatHistory} onSend={handleChatSend} disabled={!head.config.prompt.trim()} />
+            <HistoryPanel commits={finalized} onRestore={handleRestore} />
+          </div>
+
+          <div>
+            <ConfigPanel
+              draft={draft}
+              onChange={setDraft}
+              isDirty={isDirty}
+              onSave={handleSaveClick}
+              byokKey={byokKey}
+              onByokChange={setByokKey}
+              locked={flowStep !== null}
+            />
+
+            {flowStep && (
+              <CommitFlow
+                step={flowStep}
+                commitMessage={commitMessageDraft}
+                onCommitMessageChange={setCommitMessageDraft}
+                onConfirmCommit={handleConfirmCommit}
+                onCancel={handleCancelCommit}
+                onWantDemo={handleWantDemo}
+                onSkipDemo={handleSkipDemo}
+                demoPhase={demoPhase}
+                demoResult={demoResult}
+                demoError={demoError}
+                onKeep={handleKeep}
+                onRollback={handleRollback}
+              />
+            )}
+          </div>
         </div>
       </div>
     </main>
