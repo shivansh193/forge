@@ -29,12 +29,12 @@ export default function ChatPane({
   }
 
   return (
-    <div className="border border-line rounded-[14px] bg-surface flex flex-col h-[560px]">
-      <div className="panel-label px-4 pt-3.5 pb-3 border-b border-line-soft">Chat</div>
+    <div className="border border-line rounded-[16px] bg-surface flex flex-col h-[680px]">
+      <div className="panel-label px-5 pt-5 pb-4 border-b border-line-soft text-[14px]">Chat</div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
         {history.length === 0 && (
-          <div className="text-[13px] text-ink-subtle italic">
+          <div className="text-[14px] text-ink-subtle italic">
             No messages yet — try the agent below.
           </div>
         )}
@@ -42,7 +42,7 @@ export default function ChatPane({
           <div key={m.id} className={m.role === "user" ? "text-right" : "text-left"}>
             <div
               className={
-                "inline-block max-w-[85%] text-left text-[13px] leading-relaxed rounded-[10px] px-3.5 py-2.5 " +
+                "inline-block max-w-[85%] text-left text-[14px] leading-relaxed rounded-[12px] px-4 py-3 " +
                 (m.role === "user"
                   ? "bg-accent-soft text-ink"
                   : "bg-surface-soft border border-line-soft text-ink-muted")
@@ -56,10 +56,10 @@ export default function ChatPane({
             </div>
           </div>
         ))}
-        {sending && <div className="text-[12px] text-ink-subtle italic">Thinking…</div>}
+        {sending && <div className="text-[13px] text-ink-subtle italic">Thinking…</div>}
       </div>
 
-      <div className="flex gap-2 p-3 border-t border-line-soft">
+      <div className="flex gap-2.5 p-4 border-t border-line-soft">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -71,12 +71,12 @@ export default function ChatPane({
           }}
           disabled={disabled}
           placeholder={disabled ? "Add a prompt first…" : "Message this agent…"}
-          className="flex-1 text-[13px] px-3 h-9 border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
+          className="flex-1 text-[14px] px-4 h-11 border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
         />
         <button
           onClick={handleSend}
           disabled={disabled || sending || !input.trim()}
-          className="cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
+          className="cursor-pointer text-[14px] font-medium h-11 px-5 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
         >
           Send
         </button>

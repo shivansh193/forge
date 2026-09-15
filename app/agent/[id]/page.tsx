@@ -218,34 +218,34 @@ export default function AgentDetail() {
   }
 
   return (
-    <main className="max-w-[980px] mx-auto px-8 py-12">
+    <main className="max-w-[1240px] mx-auto px-10 py-14">
       <div className="flex justify-between items-start gap-4">
-        <Link href="/" className="text-[13px] font-medium text-ink-faint hover:text-ink transition-colors">
+        <Link href="/" className="text-[14px] font-medium text-ink-faint hover:text-ink transition-colors">
           ← All agents
         </Link>
         <ThemeToggle />
       </div>
 
-      <div className="flex items-center justify-between gap-3 mt-4 mb-8">
-        <div className="flex items-center gap-3 min-w-0">
-          <Avatar seed={agent.avatarSeed} size={44} />
+      <div className="flex items-center justify-between gap-3 mt-5 mb-10">
+        <div className="flex items-center gap-4 min-w-0">
+          <Avatar seed={agent.avatarSeed} size={60} />
           <input
             value={nameDraft}
             onChange={(e) => setNameDraft(e.target.value)}
             onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
-            className="font-serif italic font-medium text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line min-w-0"
+            className="font-serif italic font-medium text-[38px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line min-w-0"
           />
         </div>
         <button
           onClick={handleFork}
-          className="shrink-0 cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
+          className="shrink-0 cursor-pointer text-[14px] font-medium h-10 px-5 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
         >
           Fork
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-7">
+        <div className="space-y-7">
           <ChatPane history={agent.chatHistory} onSend={handleChatSend} disabled={!head.config.prompt.trim()} />
           <HistoryPanel commits={finalized} onRestore={handleRestore} />
         </div>

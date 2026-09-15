@@ -4,7 +4,7 @@ import { AgentConfig, Provider } from "@/lib/types";
 import { PROVIDER_INFO, defaultModelFor, hasServerFallback } from "@/lib/llm";
 
 const inputClass =
-  "w-full text-[13px] px-3 py-[6px] border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60";
+  "w-full text-[14px] px-3.5 h-11 border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60";
 
 export default function ConfigPanel({
   draft,
@@ -30,22 +30,22 @@ export default function ConfigPanel({
   }
 
   return (
-    <div className="border border-line rounded-[14px] bg-surface p-5">
-      <div className="panel-label mb-3 pb-3 border-b border-line-soft">Config</div>
+    <div className="border border-line rounded-[16px] bg-surface p-6">
+      <div className="panel-label mb-4 pb-4 border-b border-line-soft text-[14px]">Config</div>
 
-      <label className="block field-label mb-1.5">Prompt &amp; context</label>
+      <label className="block field-label mb-2 text-[13px]">Prompt &amp; context</label>
       <textarea
         value={draft.prompt}
         onChange={(e) => onChange({ ...draft, prompt: e.target.value })}
-        rows={14}
+        rows={20}
         disabled={locked}
         placeholder="Paste your full system prompt here — instructions and any background/context together."
-        className={`${inputClass} p-3 resize-y leading-relaxed bg-surface-soft`}
+        className={`w-full text-[14px] p-4 border border-line rounded-[6px] bg-surface-soft text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60 resize-y leading-relaxed`}
       />
 
-      <div className="flex gap-4 mt-4 flex-wrap">
-        <div className="flex-1 min-w-[130px]">
-          <label className="block field-label mb-1.5">
+      <div className="flex gap-4 mt-5 flex-wrap">
+        <div className="flex-1 min-w-[150px]">
+          <label className="block field-label mb-2 text-[13px]">
             Temperature: {draft.temperature.toFixed(1)}
           </label>
           <input
@@ -59,8 +59,8 @@ export default function ConfigPanel({
             className="w-full disabled:opacity-60"
           />
         </div>
-        <div className="flex-1 min-w-[130px]">
-          <label className="block field-label mb-1.5">Provider</label>
+        <div className="flex-1 min-w-[150px]">
+          <label className="block field-label mb-2 text-[13px]">Provider</label>
           <select
             value={draft.provider}
             onChange={(e) => setProvider(e.target.value as Provider)}
@@ -76,8 +76,8 @@ export default function ConfigPanel({
         </div>
       </div>
 
-      <div className="mt-4">
-        <label className="block field-label mb-1.5">Model</label>
+      <div className="mt-5">
+        <label className="block field-label mb-2 text-[13px]">Model</label>
         <input
           type="text"
           value={draft.model}
@@ -87,8 +87,8 @@ export default function ConfigPanel({
         />
       </div>
 
-      <div className="mt-5 pt-4 border-t border-line-soft">
-        <label className="block field-label mb-1.5">
+      <div className="mt-6 pt-5 border-t border-line-soft">
+        <label className="block field-label mb-2 text-[13px]">
           {providerInfo.label} API key{" "}
           <span className="font-normal text-ink-subtle">
             {hasServerFallback(draft.provider) ? "(optional — use your own)" : "(required)"}
@@ -105,7 +105,7 @@ export default function ConfigPanel({
           }
           className={`${inputClass} font-mono`}
         />
-        <div className="text-[12px] text-ink-subtle mt-1.5">
+        <div className="text-[13px] text-ink-subtle mt-2 leading-relaxed">
           {hasServerFallback(draft.provider)
             ? "Used only to make this request, never logged or stored — or leave blank to use the shared demo key."
             : `${providerInfo.label} needs your own key — this app has no shared ${providerInfo.label} key. Used only to make this request, never logged or stored.`}
@@ -115,7 +115,7 @@ export default function ConfigPanel({
       <button
         onClick={onSave}
         disabled={!isDirty || locked}
-        className="mt-5 w-full cursor-pointer text-[13px] font-medium h-9 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
+        className="mt-6 w-full cursor-pointer text-[14px] font-medium h-11 rounded-[2px] bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent transition-colors"
       >
         {locked ? "Resolve the pending commit below" : isDirty ? "Save changes…" : "No changes to commit"}
       </button>

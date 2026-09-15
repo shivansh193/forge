@@ -93,7 +93,7 @@ body {
   background: var(--page);
   color: var(--ink);
   font-family: var(--font-plex-sans), -apple-system, "Segoe UI", Arial, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 body, body * {
