@@ -1,0 +1,95 @@
+<svg viewBox="0 0 960 700" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a473f" />
+    </marker>
+    <marker id="arrowReturn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9a9488" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="700" fill="#faf9f6" />
+
+  <!-- Title -->
+  <text x="40" y="36" font-size="22" font-weight="700" fill="#1c1b19">Forge — architecture</text>
+  <text x="40" y="56" font-size="13" fill="#6b6862">Prompt edits are versioned client-side. Two server routes handle test-message generation and execution against whichever model provider the agent uses.</text>
+
+  <!-- ===== Client band ===== -->
+  <rect x="40" y="80" width="880" height="190" rx="16" fill="#ffffff" stroke="#e3e1da" stroke-width="1.5" />
+  <text x="64" y="108" font-size="14" font-weight="700" fill="#2f3a5c">Browser — Next.js client (React)</text>
+
+  <g>
+    <rect x="64" y="122" width="190" height="52" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+    <text x="159" y="153" font-size="13" fill="#1c1b19" text-anchor="middle">Dashboard</text>
+  </g>
+  <g>
+    <rect x="270" y="122" width="190" height="52" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+    <text x="365" y="153" font-size="13" fill="#1c1b19" text-anchor="middle">Chat</text>
+  </g>
+  <g>
+    <rect x="476" y="122" width="190" height="52" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+    <text x="571" y="146" font-size="13" fill="#1c1b19" text-anchor="middle">Config editor +</text>
+    <text x="571" y="163" font-size="13" fill="#1c1b19" text-anchor="middle">commit flow</text>
+  </g>
+  <g>
+    <rect x="682" y="122" width="212" height="52" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+    <text x="788" y="146" font-size="13" fill="#1c1b19" text-anchor="middle">History +</text>
+    <text x="788" y="163" font-size="13" fill="#1c1b19" text-anchor="middle">word-level diff</text>
+  </g>
+
+  <!-- localStorage note -->
+  <rect x="64" y="196" width="830" height="52" rx="10" fill="#eceef4" stroke="#c7cde0" />
+  <text x="84" y="217" font-size="13" font-weight="700" fill="#2f3a5c">localStorage — agents · commits · chat history</text>
+  <text x="84" y="235" font-size="12" fill="#4a5478">Browser-only, no server database. A commit is written only after you click Keep — Rollback discards it, nothing persists.</text>
+
+  <!-- Arrows: client -> server -->
+  <path d="M 365 270 L 365 320" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <text x="375" y="298" font-size="11.5" fill="#6b6862">generate test message</text>
+  <text x="375" y="312" font-size="11.5" fill="#6b6862">(prompt only)</text>
+
+  <path d="M 620 270 L 700 320" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <text x="628" y="298" font-size="11.5" fill="#6b6862">run message</text>
+  <text x="628" y="312" font-size="11.5" fill="#6b6862">(config + message)</text>
+
+  <!-- ===== Server band ===== -->
+  <rect x="40" y="320" width="880" height="150" rx="16" fill="#ffffff" stroke="#e3e1da" stroke-width="1.5" />
+  <text x="64" y="348" font-size="14" font-weight="700" fill="#2f3a5c">Next.js API routes (server)</text>
+
+  <rect x="200" y="360" width="260" height="46" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+  <text x="330" y="388" font-size="13" fill="#1c1b19" text-anchor="middle">/api/test-prompt</text>
+
+  <rect x="500" y="360" width="260" height="46" rx="10" fill="#faf9f6" stroke="#e3e1da" />
+  <text x="630" y="388" font-size="13" fill="#1c1b19" text-anchor="middle">/api/chat</text>
+
+  <path d="M 330 406 L 400 430" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <path d="M 630 406 L 560 430" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+
+  <rect x="220" y="432" width="520" height="38" rx="10" fill="#eceef4" stroke="#c7cde0" />
+  <text x="480" y="456" font-size="13" font-weight="700" fill="#2f3a5c" text-anchor="middle">lib/llm.ts — provider router</text>
+
+  <!-- Arrows: server -> providers -->
+  <path d="M 330 470 L 200 540" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <path d="M 480 470 L 480 540" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <path d="M 630 470 L 760 540" stroke="#4a473f" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+  <text x="480" y="500" font-size="11.5" fill="#6b6862" text-anchor="middle">routed by the agent's chosen provider</text>
+
+  <!-- ===== Providers band ===== -->
+  <rect x="40" y="550" width="880" height="120" rx="16" fill="#ffffff" stroke="#e3e1da" stroke-width="1.5" />
+  <text x="64" y="578" font-size="14" font-weight="700" fill="#2f3a5c">Model APIs — chosen per agent</text>
+
+  <rect x="90" y="595" width="220" height="55" rx="10" fill="#eef2f8" stroke="#4a6fa5" />
+  <text x="200" y="628" font-size="13" font-weight="700" fill="#2c4771" text-anchor="middle">Gemini</text>
+
+  <rect x="370" y="595" width="220" height="55" rx="10" fill="#eef6f5" stroke="#3f8f86" />
+  <text x="480" y="628" font-size="13" font-weight="700" fill="#245a53" text-anchor="middle">OpenAI</text>
+
+  <rect x="650" y="595" width="220" height="55" rx="10" fill="#f8efe8" stroke="#b8734a" />
+  <text x="760" y="628" font-size="13" font-weight="700" fill="#7a4a28" text-anchor="middle">Anthropic</text>
+
+  <!-- Return path -->
+  <path d="M 900 590 C 940 460, 940 300, 900 260" stroke="#9a9488" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrowReturn)" fill="none" />
+  <text x="945" y="430" font-size="12" fill="#9a9488" text-anchor="middle" transform="rotate(90 945 430)">response text</text>
+
+  <!-- Footer note -->
+  <text x="40" y="692" font-size="12" fill="#9a9488">BYOK: Gemini falls back to a shared server key; OpenAI and Anthropic require the viewer's own key, sent per-request and never stored.</text>
+</svg>
