@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAgents, useByokKey } from "@/lib/storage";
+import { createAgentRecord } from "@/lib/agentFactory";
 import { AgentConfig, Commit } from "@/lib/types";
 import { diffPrompt, summarizeDiff } from "@/lib/diff";
 import Avatar from "@/components/Avatar";
@@ -19,8 +20,9 @@ function nanoid(): string {
 
 export default function AgentDetail() {
   const params = useParams();
+  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : (params.id as string);
-  const { agents, loaded, updateAgent } = useAgents();
+  const { agents, loaded, updateAgent, addAgent } = useAgents();
   const { key: byokKey, setKey: setByokKey } = useByokKey();
 
   const agent = agents.find((a) => a.id === id);
@@ -34,6 +36,7 @@ export default function AgentDetail() {
   const [demoResult, setDemoResult] = useState<DemoResult | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
+  const [demoPhase, setDemoPhase] = useState<"prompt" | "response" | null>(null);
   const demoInFlight = useRef(false);
 
   useEffect(() => {
@@ -59,7 +62,8 @@ export default function AgentDetail() {
   const isDirty =
     draft.prompt !== head.config.prompt ||
     draft.temperature !== head.config.temperature ||
-    draft.model !== head.config.model;
+    draft.model !== head.config.model ||
+    draft.provider !== head.config.provider;
 
   function handleSaveClick() {
     setCommitMessageDraft(summarizeDiff(head!.config.prompt, draft!.prompt) || "Manual edit");
@@ -104,21 +108,44 @@ export default function AgentDetail() {
     setFlowStep("demoLoading");
     setDemoError(null);
     try {
-      const res = await fetch("/api/demo", {
+      setDemoPhase("prompt");
+      const promptRes = await fetch("/api/test-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ config: pendingCommit.config, apiKey: byokKey }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Demo generation failed.");
-      setDemoResult({ testPrompt: data.testPrompt, response: data.response });
+      const promptData = await promptRes.json();
+      if (!promptRes.ok) throw new Error(promptData.error || "Couldn't write a test message.");
+
+      setDemoPhase("response");
+      const chatRes = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          config: pendingCommit.config,
+          message: promptData.testPrompt,
+          apiKey: byokKey,
+        }),
+      });
+      const chatData = await chatRes.json();
+      if (!chatRes.ok) throw new Error(chatData.error || "Demo generation failed.");
+
+      setDemoResult({ testPrompt: promptData.testPrompt, response: chatData.response });
       setFlowStep("demoResult");
     } catch (err) {
       setDemoError(err instanceof Error ? err.message : "Demo generation failed.");
       setFlowStep("demoError");
     } finally {
       demoInFlight.current = false;
+      setDemoPhase(null);
     }
+  }
+
+  function handleFork() {
+    if (!head) return;
+    const forked = createAgentRecord(`${agent!.name} (fork)`, head.config, `Forked from ${agent!.name}`);
+    addAgent(forked);
+    router.push(`/agent/${forked.id}`);
   }
 
   function handleKeep() {
@@ -199,14 +226,22 @@ export default function AgentDetail() {
         <ThemeToggle />
       </div>
 
-      <div className="flex items-center gap-3 mt-4 mb-8">
-        <Avatar seed={agent.avatarSeed} size={44} />
-        <input
-          value={nameDraft}
-          onChange={(e) => setNameDraft(e.target.value)}
-          onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
-          className="font-serif italic font-medium text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line"
-        />
+      <div className="flex items-center justify-between gap-3 mt-4 mb-8">
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar seed={agent.avatarSeed} size={44} />
+          <input
+            value={nameDraft}
+            onChange={(e) => setNameDraft(e.target.value)}
+            onBlur={() => updateAgent(agent.id, (a) => ({ ...a, name: nameDraft.trim() || a.name }))}
+            className="font-serif italic font-medium text-[26px] tracking-[-0.01em] text-ink bg-transparent outline-none border-b border-transparent focus:border-line min-w-0"
+          />
+        </div>
+        <button
+          onClick={handleFork}
+          className="shrink-0 cursor-pointer text-[13px] font-medium h-9 px-4 rounded-[2px] bg-surface text-ink-muted border border-line hover:bg-surface-soft transition-colors"
+        >
+          Fork
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
@@ -235,6 +270,7 @@ export default function AgentDetail() {
               onCancel={handleCancelCommit}
               onWantDemo={handleWantDemo}
               onSkipDemo={handleSkipDemo}
+              demoPhase={demoPhase}
               demoResult={demoResult}
               demoError={demoError}
               onKeep={handleKeep}

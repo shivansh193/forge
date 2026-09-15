@@ -1,4 +1,7 @@
+export type Provider = "gemini" | "openai" | "anthropic";
+
 export interface AgentConfig {
+  provider: Provider;
   prompt: string;
   temperature: number;
   model: string;

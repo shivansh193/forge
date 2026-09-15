@@ -1,6 +1,7 @@
 "use client";
 
-import { AgentConfig } from "@/lib/types";
+import { AgentConfig, Provider } from "@/lib/types";
+import { PROVIDER_INFO, defaultModelFor, hasServerFallback } from "@/lib/llm";
 
 const inputClass =
   "w-full text-[13px] px-3 py-[6px] border border-line rounded-[6px] bg-surface text-ink outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60";
@@ -22,6 +23,12 @@ export default function ConfigPanel({
   onByokChange: (value: string) => void;
   locked: boolean;
 }) {
+  const providerInfo = PROVIDER_INFO.find((p) => p.id === draft.provider) ?? PROVIDER_INFO[0];
+
+  function setProvider(provider: Provider) {
+    onChange({ ...draft, provider, model: defaultModelFor(provider) });
+  }
+
   return (
     <div className="border border-line rounded-[14px] bg-surface p-5">
       <div className="panel-label mb-3 pb-3 border-b border-line-soft">Config</div>
@@ -37,7 +44,7 @@ export default function ConfigPanel({
       />
 
       <div className="flex gap-4 mt-4 flex-wrap">
-        <div className="flex-1 min-w-[160px]">
+        <div className="flex-1 min-w-[130px]">
           <label className="block field-label mb-1.5">
             Temperature: {draft.temperature.toFixed(1)}
           </label>
@@ -52,31 +59,56 @@ export default function ConfigPanel({
             className="w-full disabled:opacity-60"
           />
         </div>
-        <div className="flex-1 min-w-[160px]">
-          <label className="block field-label mb-1.5">Model</label>
-          <input
-            type="text"
-            value={draft.model}
-            onChange={(e) => onChange({ ...draft, model: e.target.value })}
+        <div className="flex-1 min-w-[130px]">
+          <label className="block field-label mb-1.5">Provider</label>
+          <select
+            value={draft.provider}
+            onChange={(e) => setProvider(e.target.value as Provider)}
             disabled={locked}
-            className={`${inputClass} font-mono`}
-          />
+            className={inputClass}
+          >
+            {PROVIDER_INFO.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="block field-label mb-1.5">Model</label>
+        <input
+          type="text"
+          value={draft.model}
+          onChange={(e) => onChange({ ...draft, model: e.target.value })}
+          disabled={locked}
+          className={`${inputClass} font-mono`}
+        />
       </div>
 
       <div className="mt-5 pt-4 border-t border-line-soft">
         <label className="block field-label mb-1.5">
-          API key <span className="font-normal text-ink-subtle">(optional — use your own)</span>
+          {providerInfo.label} API key{" "}
+          <span className="font-normal text-ink-subtle">
+            {hasServerFallback(draft.provider) ? "(optional — use your own)" : "(required)"}
+          </span>
         </label>
         <input
           type="password"
           value={byokKey}
           onChange={(e) => onByokChange(e.target.value)}
-          placeholder="Paste a Gemini API key to use instead of the shared demo key"
+          placeholder={
+            hasServerFallback(draft.provider)
+              ? `Paste a ${providerInfo.label} API key to use instead of the shared demo key`
+              : `Paste your ${providerInfo.label} API key`
+          }
           className={`${inputClass} font-mono`}
         />
         <div className="text-[12px] text-ink-subtle mt-1.5">
-          Stays in your browser — sent straight to Google, never through our server.
+          {hasServerFallback(draft.provider)
+            ? "Used only to make this request, never logged or stored — or leave blank to use the shared demo key."
+            : `${providerInfo.label} needs your own key — this app has no shared ${providerInfo.label} key. Used only to make this request, never logged or stored.`}
         </div>
       </div>
 

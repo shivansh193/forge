@@ -24,6 +24,7 @@ export default function CommitFlow({
   onCancel,
   onWantDemo,
   onSkipDemo,
+  demoPhase,
   demoResult,
   demoError,
   onKeep,
@@ -36,6 +37,7 @@ export default function CommitFlow({
   onCancel: () => void;
   onWantDemo: () => void;
   onSkipDemo: () => void;
+  demoPhase: "prompt" | "response" | null;
   demoResult: DemoResult | null;
   demoError: string | null;
   onKeep: () => void;
@@ -80,8 +82,19 @@ export default function CommitFlow({
       )}
 
       {step === "demoLoading" && (
-        <div className="text-[13px] text-ink-faint italic">
-          Generating a test message and running it against the new version…
+        <div className="flex flex-col gap-2">
+          <div className={`flex items-center gap-2 text-[13px] ${demoPhase === "prompt" ? "text-ink" : "text-ink-subtle"}`}>
+            <span
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${demoPhase === "prompt" ? "bg-accent animate-pulse" : "bg-ok"}`}
+            />
+            Writing a test message{demoPhase === "prompt" ? "…" : " — done"}
+          </div>
+          <div className={`flex items-center gap-2 text-[13px] ${demoPhase === "response" ? "text-ink" : "text-ink-subtle"}`}>
+            <span
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${demoPhase === "response" ? "bg-accent animate-pulse" : "bg-line"}`}
+            />
+            Running it against the new version{demoPhase === "response" ? "…" : ""}
+          </div>
         </div>
       )}
 

@@ -7,6 +7,16 @@ import { getPresetAgents } from "./presets";
 const STORAGE_KEY = "forge.agents.v1";
 const API_KEY_STORAGE = "forge.byokKey.v1";
 
+function normalizeAgent(agent: Agent): Agent {
+  return {
+    ...agent,
+    commits: agent.commits.map((c) => ({
+      ...c,
+      config: { ...c.config, provider: c.config.provider ?? "gemini" },
+    })),
+  };
+}
+
 function readAgents(): Agent[] {
   if (typeof window === "undefined") return [];
   try {
@@ -14,7 +24,7 @@ function readAgents(): Agent[] {
     if (!raw) return getPresetAgents();
     const parsed = JSON.parse(raw) as Agent[];
     if (!Array.isArray(parsed) || parsed.length === 0) return getPresetAgents();
-    return parsed;
+    return parsed.map(normalizeAgent);
   } catch {
     return getPresetAgents();
   }

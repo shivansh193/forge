@@ -2,42 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useAgents } from "@/lib/storage";
+import { createAgentRecord, blankConfig } from "@/lib/agentFactory";
 import AgentCard from "@/components/AgentCard";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Agent } from "@/lib/types";
-
-function newAgentId() {
-  return `agent-${Date.now().toString(36)}`;
-}
 
 export default function Home() {
   const { agents, loaded, addAgent } = useAgents();
   const router = useRouter();
 
   function createAgent() {
-    const id = newAgentId();
-    const name = "New agent";
-    const now = new Date().toISOString();
-    const agent: Agent = {
-      id,
-      name,
-      avatarSeed: id,
-      createdAt: now,
-      commits: [
-        {
-          id: `${id}-c0`,
-          timestamp: now,
-          message: "Initial version",
-          config: { prompt: "", temperature: 0.7, model: "gemini-flash-lite-latest" },
-          promptDiffFromPrev: null,
-          status: "finalized",
-          demo: null,
-        },
-      ],
-      chatHistory: [],
-    };
+    const agent = createAgentRecord("New agent", blankConfig(), "Initial version");
     addAgent(agent);
-    router.push(`/agent/${id}`);
+    router.push(`/agent/${agent.id}`);
   }
 
   return (
