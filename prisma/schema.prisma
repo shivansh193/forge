@@ -10,20 +10,25 @@ datasource db {
 
 // One row per agent. `data` is the full Agent record (commits, chat
 // history, pinned tests, config — everything in lib/types.ts's Agent
-// shape) serialized as JSON. Session-scoped instead of user-scoped: there
-// are no accounts, a random cookie stands in for "your workspace."
+// shape) serialized as JSON. User-scoped: `userId` is the id of the row in
+// Neon Auth's `neon_auth.user` table (see lib/auth/server.ts), taken from
+// the session, not a foreign key Prisma manages — that table lives in a
+// schema Neon Auth owns and migrates on its own, so we intentionally don't
+// declare a cross-schema relation to it (no `multiSchema` datasource entry,
+// no `@relation`); we just trust the id Neon Auth's session handed us.
 //
-// `id` is only unique WITHIN a session, not globally — every fresh session
-// seeds its own copy of the same preset agents (id "resume-builder", etc),
-// so two different sessions legitimately hold rows with the same `id`. The
-// primary key has to be the (sessionId, id) pair, not `id` alone.
+// `id` is only unique WITHIN a user's workspace, not globally — every new
+// account seeds its own copy of the same preset agents (id
+// "resume-builder", etc), so two different users legitimately hold rows
+// with the same `id`. The primary key has to be the (userId, id) pair, not
+// `id` alone.
 model Agent {
   id        String
-  sessionId String
+  userId    String
   name      String
   data      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@id([sessionId, id])
+  @@id([userId, id])
 }
