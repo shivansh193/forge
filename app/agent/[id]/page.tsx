@@ -189,8 +189,8 @@ export default function AgentDetail() {
   return (
     <main className="max-w-[980px] mx-auto px-8 py-12">
       <div className="flex justify-between items-start gap-4">
-        <Link href="/" className="tag-label hover:text-ink-faint">
-          ← all agents
+        <Link href="/" className="text-[13px] font-medium text-ink-faint hover:text-ink transition-colors">
+          ← All agents
         </Link>
         <ThemeToggle />
       </div>

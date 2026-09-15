@@ -27,10 +27,10 @@ export default function HistoryPanel({
   const ordered = [...commits].reverse();
 
   return (
-    <div className="border border-line rounded-sm bg-surface">
-      <div className="flex items-baseline justify-between px-5 pt-4 pb-3 border-b border-line-soft">
-        <span className="tag-label">history</span>
-        <span className="tag-label">
+    <div className="border border-line rounded-[6px] bg-surface shadow-[var(--shadow-sm)]">
+      <div className="flex items-baseline justify-between px-4 pt-3.5 pb-3 border-b border-line-soft">
+        <span className="panel-label">History</span>
+        <span className="meta">
           {commits.length} commit{commits.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -41,29 +41,27 @@ export default function HistoryPanel({
           const prev = commits[commits.indexOf(c) - 1];
           const isOpen = expanded === c.id;
           return (
-            <div key={c.id} className="px-5 py-3.5 border-b border-line-soft last:border-b-0">
+            <div key={c.id} className="px-4 py-3.5 border-b border-line-soft last:border-b-0">
               <div className="flex justify-between items-start gap-3">
                 <div className="min-w-0">
-                  <div className="flex items-baseline gap-2 min-w-0">
-                    <span className="font-mono text-[11px] text-ink-subtle shrink-0">
+                  <div className="flex items-baseline gap-2 min-w-0 flex-wrap">
+                    <span className="meta bg-surface-soft border border-line-soft rounded-[4px] px-1.5 py-[1px] shrink-0">
                       {c.id.slice(-7)}
                     </span>
-                    <span className="text-[13px] font-semibold text-ink truncate">{c.message}</span>
+                    <span className="text-[13px] font-semibold text-ink">{c.message}</span>
                     {isHead && (
-                      <span className="font-mono text-[10px] text-ok border border-ok px-1 rounded-sm shrink-0">
+                      <span className="text-[10px] font-semibold text-ok bg-ok-bg px-1.5 py-[1px] rounded-[4px] shrink-0">
                         HEAD
                       </span>
                     )}
                   </div>
-                  <div className="font-mono text-[11px] text-ink-subtle mt-1">
-                    {formatTime(c.timestamp)}
-                  </div>
+                  <div className="meta mt-1">{formatTime(c.timestamp)}</div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex gap-1 shrink-0">
                   {prev && (
                     <button
                       onClick={() => setExpanded(isOpen ? null : c.id)}
-                      className="cursor-pointer text-[11px] font-semibold px-2 py-1 rounded-sm text-ink-muted hover:bg-surface-soft"
+                      className="cursor-pointer text-[12px] font-medium px-2 h-7 rounded-[6px] text-ink-muted hover:bg-surface-soft transition-colors"
                     >
                       {isOpen ? "Hide diff" : "View diff"}
                     </button>
@@ -71,7 +69,7 @@ export default function HistoryPanel({
                   {!isHead && (
                     <button
                       onClick={() => onRestore(c)}
-                      className="cursor-pointer text-[11px] font-semibold px-2 py-1 rounded-sm text-accent hover:bg-surface-soft"
+                      className="cursor-pointer text-[12px] font-medium px-2 h-7 rounded-[6px] text-accent hover:bg-surface-soft transition-colors"
                     >
                       Restore
                     </button>
@@ -80,13 +78,13 @@ export default function HistoryPanel({
               </div>
 
               {isOpen && prev && (
-                <div className="mt-3 p-3 rounded-sm bg-surface-soft">
+                <div className="mt-3 p-3 rounded-[6px] bg-surface-soft border border-line-soft">
                   <DiffView tokens={diffPrompt(prev.config.prompt, c.config.prompt)} />
                 </div>
               )}
 
               {c.demo && (
-                <div className="mt-2 text-[11px] text-ink-subtle italic">
+                <div className="mt-2 text-[12px] text-ink-subtle italic">
                   Demo-tested before commit
                 </div>
               )}

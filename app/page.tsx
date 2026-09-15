@@ -43,29 +43,31 @@ export default function Home() {
   return (
     <main className="max-w-[880px] mx-auto px-8 py-16 w-full">
       <div className="flex justify-between items-center">
-        <div className="tag-label flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-          forge
+        <div className="flex items-center gap-2 text-[14px] font-semibold text-ink">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" className="text-accent">
+            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 12H7V7h2v5zm0-6H7V4h2v2z" />
+          </svg>
+          Forge
         </div>
         <ThemeToggle />
       </div>
-      <h1 className="font-bold text-[40px] leading-[1.1] tracking-[-0.02em] text-ink mt-4">
+      <h1 className="font-bold text-[32px] leading-[1.2] tracking-[-0.01em] text-ink mt-6">
         Your agents
       </h1>
-      <p className="text-[14px] text-ink-faint mt-3 max-w-[480px] leading-relaxed">
+      <p className="text-[14px] text-ink-faint mt-2 max-w-[480px] leading-relaxed">
         Every agent keeps a config, a chat, and a commit history. Edit the prompt, preview a
         response, keep it or roll it back.
       </p>
 
-      <div className="mt-10 flex justify-between items-center">
-        <div className="tag-label">
-          {loaded ? `${agents.length} agent${agents.length === 1 ? "" : "s"}` : "loading…"}
+      <div className="mt-8 flex justify-between items-center">
+        <div className="field-label">
+          {loaded ? `${agents.length} agent${agents.length === 1 ? "" : "s"}` : "Loading…"}
         </div>
         <button
           onClick={createAgent}
-          className="cursor-pointer text-[13px] font-semibold px-4 py-2 rounded-sm bg-accent text-accent-ink hover:opacity-90 transition-opacity"
+          className="cursor-pointer text-[13px] font-medium h-8 px-3.5 rounded-[6px] bg-accent text-accent-ink border border-black/10 shadow-[var(--shadow-sm)] hover:bg-accent-hover transition-colors"
         >
-          + New agent
+          New agent
         </button>
       </div>
 
