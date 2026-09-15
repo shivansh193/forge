@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeAgent } from "../storage";
+import { normalizeAgent } from "../normalizeAgent";
 import { Agent } from "../types";
 
 function makeAgentWithConfig(config: Record<string, unknown>): Agent {

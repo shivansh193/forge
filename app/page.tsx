@@ -6,6 +6,7 @@ import { useAgents } from "@/lib/storage";
 import { createAgentRecord, blankConfig } from "@/lib/agentFactory";
 import AgentCard from "@/components/AgentCard";
 import Avatar from "@/components/Avatar";
+import LocalImportBanner from "@/components/LocalImportBanner";
 import Link from "next/link";
 
 interface ActivityItem {
@@ -77,6 +78,8 @@ export default function Home() {
           Every agent keeps a config, a chat, and a commit history — edit the prompt, preview a
           response, keep it or roll it back.
         </p>
+
+        {loaded && <LocalImportBanner existingAgents={agents} onImport={addAgent} />}
 
         <div className="mt-10 flex items-baseline justify-between">
           <div className="meta text-[13px]">

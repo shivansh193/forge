@@ -1,113 +1,103 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Agent } from "./types";
-import { getPresetAgents } from "./presets";
+import { normalizeAgent } from "./normalizeAgent";
 
-const STORAGE_KEY = "forge.agents.v1";
+export { normalizeAgent };
+
 const API_KEY_STORAGE = "forge.byokKey.v1";
-const SYNC_EVENT = "forge:agents-changed";
 
-export function normalizeAgent(agent: Agent): Agent {
-  return {
-    ...agent,
-    commits: agent.commits.map((c) => ({
-      ...c,
-      config: { ...c.config, provider: c.config.provider ?? "gemini" },
-    })),
-    pinnedTests: agent.pinnedTests ?? [],
-  };
+// Module-level cache shared by every useAgents() instance in the tab
+// (Sidebar, the agents list, the agent detail page all mount their own
+// hook). Loaded once per page session from the server, then kept in sync
+// purely in memory — mutations update this cache synchronously (so code
+// right after addAgent/updateAgent, like a router.push, sees the new agent
+// immediately) and persist to the server in the background. A second
+// useAgents() mount (e.g. after client-side navigation) reads the
+// already-loaded cache instead of re-fetching, which also avoids a race
+// where a fresh GET could land before an in-flight PUT and show stale data.
+let cache: Agent[] | null = null;
+let inFlight: Promise<Agent[]> | null = null;
+const listeners = new Set<(agents: Agent[]) => void>();
+
+async function loadAgents(): Promise<Agent[]> {
+  if (cache) return cache;
+  if (inFlight) return inFlight;
+  inFlight = fetch("/api/agents")
+    .then((res) => res.json())
+    .then((data) => {
+      const agents = (data.agents as Agent[]).map(normalizeAgent);
+      cache = agents;
+      inFlight = null;
+      return agents;
+    })
+    .catch((err) => {
+      inFlight = null;
+      throw err;
+    });
+  return inFlight;
 }
 
-function readAgents(): Agent[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return getPresetAgents();
-    const parsed = JSON.parse(raw) as Agent[];
-    if (!Array.isArray(parsed) || parsed.length === 0) return getPresetAgents();
-    return parsed.map(normalizeAgent);
-  } catch {
-    return getPresetAgents();
-  }
-}
-
-function writeAgents(agents: Agent[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(agents));
-  // Every useAgents() call site holds its own React state — this notifies
-  // sibling instances (e.g. the persistent Sidebar) mounted elsewhere in the
-  // tree so an action on one page (import, fork, new agent) shows up
-  // everywhere immediately instead of only after a reload. The `storage`
-  // event doesn't fire within the same document, so this has to be manual.
-  window.dispatchEvent(new CustomEvent<Agent[]>(SYNC_EVENT, { detail: agents }));
+function setCache(next: Agent[]) {
+  cache = next;
+  listeners.forEach((fn) => fn(next));
+  fetch("/api/agents", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ agents: next }),
+  }).catch((err) => console.error("Failed to save agents to the server:", err));
 }
 
 export function useAgents() {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  // Mirrors `agents` synchronously so writes never depend on setState-updater
-  // timing — code right after addAgent/updateAgent (e.g. router.push) must
-  // see localStorage already updated, not wait for React to flush.
-  const agentsRef = useRef<Agent[]>([]);
+  const [agents, setAgents] = useState<Agent[]>(cache ?? []);
+  const [loaded, setLoaded] = useState(cache !== null);
 
-  // Reads localStorage, which doesn't exist during SSR — can't be a lazy
-  // useState initializer without diverging from the server-rendered markup
-  // and breaking hydration, so this has to run as a client-only effect.
   useEffect(() => {
-    const initial = readAgents();
-    agentsRef.current = initial;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAgents(initial);
-    setLoaded(true);
-
-    function onSync(e: Event) {
-      const next = (e as CustomEvent<Agent[]>).detail;
-      if (next === agentsRef.current) return;
-      agentsRef.current = next;
-      setAgents(next);
+    let cancelled = false;
+    if (cache === null) {
+      loadAgents()
+        .then((loadedAgents) => {
+          if (!cancelled) {
+            setAgents(loadedAgents);
+            setLoaded(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setLoaded(true);
+        });
     }
-    window.addEventListener(SYNC_EVENT, onSync);
-    return () => window.removeEventListener(SYNC_EVENT, onSync);
+
+    function onChange(next: Agent[]) {
+      if (!cancelled) setAgents(next);
+    }
+    listeners.add(onChange);
+    return () => {
+      cancelled = true;
+      listeners.delete(onChange);
+    };
   }, []);
 
-  const commit = useCallback((next: Agent[]) => {
-    agentsRef.current = next;
-    writeAgents(next);
-    setAgents(next);
+  const updateAgent = useCallback((id: string, updater: (agent: Agent) => Agent) => {
+    const next = (cache ?? []).map((a) => (a.id === id ? updater(a) : a));
+    setCache(next);
   }, []);
 
-  const persist = useCallback(
-    (next: Agent[]) => {
-      commit(next);
-    },
-    [commit]
-  );
+  const addAgent = useCallback((agent: Agent) => {
+    const next = [...(cache ?? []), agent];
+    setCache(next);
+  }, []);
 
-  const updateAgent = useCallback(
-    (id: string, updater: (agent: Agent) => Agent) => {
-      const next = agentsRef.current.map((a) => (a.id === id ? updater(a) : a));
-      commit(next);
-    },
-    [commit]
-  );
-
-  const addAgent = useCallback(
-    (agent: Agent) => {
-      const next = [...agentsRef.current, agent];
-      commit(next);
-    },
-    [commit]
-  );
-
-  return { agents, loaded, persist, updateAgent, addAgent };
+  return { agents, loaded, updateAgent, addAgent };
 }
 
 export function useByokKey() {
   const [key, setKey] = useState("");
 
-  // Reads localStorage, which doesn't exist during SSR — client-only effect
-  // for the same reason as useAgents above.
+  // Reads localStorage, which doesn't exist during SSR — client-only effect.
+  // Intentionally stays in localStorage rather than the server: an API key
+  // is a secret, and this session model has no login to gate who can read
+  // it back from a database.
   useEffect(() => {
     const stored = window.localStorage.getItem(API_KEY_STORAGE);
     // eslint-disable-next-line react-hooks/set-state-in-effect
