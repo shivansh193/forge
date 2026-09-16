@@ -26,6 +26,11 @@ jobs:
     env:
       DATABASE_URL: "postgresql://forge:forge@localhost:5432/forge"
       DIRECT_URL: "postgresql://forge:forge@localhost:5432/forge"
+      # Not real Neon Auth credentials — lib/auth/server.ts validates these
+      # at module load, so build/test/lint fail without *some* value. CI
+      # never makes an actual auth network call, so a placeholder is enough.
+      NEON_AUTH_BASE_URL: "https://ci-placeholder.invalid/auth"
+      NEON_AUTH_COOKIE_SECRET: "ci-placeholder-secret-at-least-32-characters-long"
     steps:
       - uses: actions/checkout@v4
 
