@@ -49,14 +49,21 @@ export function resetAgentsCache() {
   inFlight = null;
 }
 
-function setCache(next: Agent[]) {
+function setCache(next: Agent[], changed: Agent) {
   cache = next;
   listeners.forEach((fn) => fn(next));
-  fetch("/api/agents", {
+  // Upsert only the one agent that actually changed, not the whole array —
+  // a whole-list write here raced with any other write in flight (another
+  // tab, or another mutation fired before this one's fetch resolved) and
+  // whichever PUT landed last silently discarded the other's change. A
+  // per-agent PUT scoped to (userId, id) can't collide with a write to a
+  // different agent, and two writes to the *same* agent just serialize to
+  // last-write-wins on that one row, which is the correct outcome.
+  fetch(`/api/agents/${changed.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ agents: next }),
-  }).catch((err) => console.error("Failed to save agents to the server:", err));
+    body: JSON.stringify(changed),
+  }).catch((err) => console.error("Failed to save agent to the server:", err));
 }
 
 export function useAgents() {
@@ -89,13 +96,17 @@ export function useAgents() {
   }, []);
 
   const updateAgent = useCallback((id: string, updater: (agent: Agent) => Agent) => {
-    const next = (cache ?? []).map((a) => (a.id === id ? updater(a) : a));
-    setCache(next);
+    const current = cache ?? [];
+    const existing = current.find((a) => a.id === id);
+    if (!existing) return; // unknown id — nothing to update, nothing to PUT
+    const updated = updater(existing);
+    const next = current.map((a) => (a.id === id ? updated : a));
+    setCache(next, updated);
   }, []);
 
   const addAgent = useCallback((agent: Agent) => {
     const next = [...(cache ?? []), agent];
-    setCache(next);
+    setCache(next, agent);
   }, []);
 
   return { agents, loaded, updateAgent, addAgent };

@@ -1,18 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth/server";
+import { requireUserId } from "@/lib/auth/requireUserId";
 import { getPresetAgents } from "@/lib/presets";
 import { normalizeAgent } from "@/lib/normalizeAgent";
 import { Agent } from "@/lib/types";
-
-// proxy.ts already redirects unauthenticated page loads to /auth/sign-in,
-// but this route can be hit directly (fetch from a stale tab, curl, etc.),
-// so it re-checks the session itself rather than trusting the caller got
-// past middleware.
-async function requireUserId(): Promise<string | null> {
-  const { data } = await auth.getSession();
-  return data?.user?.id ?? null;
-}
 
 export async function GET() {
   const userId = await requireUserId();
@@ -32,32 +23,8 @@ export async function GET() {
   return NextResponse.json({ agents });
 }
 
-export async function PUT(req: NextRequest) {
-  const userId = await requireUserId();
-  if (!userId) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
-
-  const body = await req.json();
-  const agents = body.agents;
-
-  if (!Array.isArray(agents)) {
-    return NextResponse.json({ error: "Expected { agents: Agent[] }." }, { status: 400 });
-  }
-
-  await prisma.$transaction([
-    prisma.agent.deleteMany({ where: { userId } }),
-    ...(agents.length > 0
-      ? [
-          prisma.agent.createMany({
-            data: (agents as Agent[]).map((a) => ({
-              id: a.id,
-              userId,
-              name: a.name,
-              data: JSON.stringify(a),
-            })),
-          }),
-        ]
-      : []),
-  ]);
-
-  return NextResponse.json({ ok: true });
-}
+// Writes are per-agent now (see app/api/agents/[id]/route.ts) — a whole-list
+// PUT here deleted and recreated every row in the user's workspace on each
+// save, so two saves in flight at once (two tabs, or two edits fired before
+// the first fetch resolved) raced and the loser's change vanished silently.
+// Nothing calls this collection route with anything but GET anymore.
