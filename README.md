@@ -81,7 +81,6 @@ Set all five env vars (`GEMINI_API_KEY`, `DATABASE_URL`, `DIRECT_URL`, `NEON_AUT
 
 - OpenAI and Anthropic completions are untested against a live key in this build; the request/response plumbing and error paths are verified, the actual model output is not.
 - Bisect and fork compare re-run one message per commit/fork sequentially in the browser — fine at the scale of a single agent's history, not built for hundreds of commits.
-- `/api/agents` persists by replacing your entire agent list on every save (mirrors the old `localStorage` write pattern) — fine for one tab at a time, but two tabs (or two devices) saving concurrently can clobber each other's writes. Real now that accounts make multi-device use real too, just not addressed yet.
 
 ## Roadmap
 
