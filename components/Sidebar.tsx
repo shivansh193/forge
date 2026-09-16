@@ -7,6 +7,7 @@ import { createAgentRecord, blankConfig } from "@/lib/agentFactory";
 import { TEMPLATES } from "@/lib/templates";
 import Avatar from "./Avatar";
 import ThemeToggle from "./ThemeToggle";
+import UserMenu from "./UserMenu";
 
 export default function Sidebar() {
   const { agents, addAgent } = useAgents();
@@ -90,6 +91,10 @@ export default function Sidebar() {
             );
           })}
         </div>
+      </div>
+
+      <div className="px-5 py-4 border-t border-line">
+        <UserMenu />
       </div>
     </aside>
   );

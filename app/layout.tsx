@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Newsreader, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
-import Sidebar from "@/components/Sidebar";
-import MobileTopBar from "@/components/MobileTopBar";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -38,6 +36,11 @@ try {
 } catch (e) {}
 `;
 
+// Deliberately just html/body/fonts/theme-init here — the Sidebar/
+// MobileTopBar app chrome lives in app/(app)/layout.tsx instead of here, so
+// the signed-out /auth/sign-in and /auth/sign-up pages (outside that route
+// group) render on a blank page instead of a sidebar full of another
+// user's templates and a "+ New agent" button that would just 401.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -47,13 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full bg-page text-ink">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 min-w-0 flex flex-col">
-            <MobileTopBar />
-            {children}
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );

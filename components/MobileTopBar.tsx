@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import UserMenu from "./UserMenu";
 
 export default function MobileTopBar() {
   return (
@@ -12,7 +13,10 @@ export default function MobileTopBar() {
         </svg>
         Forge
       </Link>
-      <ThemeToggle />
+      <div className="flex items-center gap-2.5">
+        <UserMenu compact />
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

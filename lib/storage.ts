@@ -39,6 +39,16 @@ async function loadAgents(): Promise<Agent[]> {
   return inFlight;
 }
 
+// Called on sign-out. The cache and its in-flight promise are module-level
+// (see comment above), so they outlive a client-side navigation to
+// /auth/sign-in and back — without this, signing out and into a *different*
+// account in the same tab would briefly render the previous account's
+// agents from memory before any request had a chance to run.
+export function resetAgentsCache() {
+  cache = null;
+  inFlight = null;
+}
+
 function setCache(next: Agent[]) {
   cache = next;
   listeners.forEach((fn) => fn(next));
@@ -95,9 +105,17 @@ export function useByokKey() {
   const [key, setKey] = useState("");
 
   // Reads localStorage, which doesn't exist during SSR — client-only effect.
-  // Intentionally stays in localStorage rather than the server: an API key
-  // is a secret, and this session model has no login to gate who can read
-  // it back from a database.
+  //
+  // Still intentionally client-only even now that real accounts exist (see
+  // README's "BYOK" section for the full reasoning) — the original
+  // justification here ("no login to gate who could read it back") is gone,
+  // but the replacement one isn't about login at all: this app has no
+  // encryption-at-rest story, so a pasted OpenAI/Anthropic key sitting in
+  // Postgres would just move the blast radius of a DB compromise from "one
+  // browser's localStorage" to "every user's key in one table," for no
+  // feature this app actually needs (nothing here uses a key when its owner
+  // isn't at the keyboard). Server-side storage would be the right call the
+  // moment that stops being true — e.g. scheduled/background runs.
   useEffect(() => {
     const stored = window.localStorage.getItem(API_KEY_STORAGE);
     // eslint-disable-next-line react-hooks/set-state-in-effect
